@@ -38,11 +38,48 @@ router.get('/livros', async (req, res) => {
 
 })
 
+/**
+ * Lista todos os Livros para ser avaliados
+ */
+router.get('/livrosnotas', async (req, res) => {
+    try {
+        /**
+         *  Este find() tras os livros avaliados pelo usuarios
+         */
+        const _livros = await Notas.find({ user: req.userId }).select('livro');
+
+        /**
+         *  aqui eu separa apenas o _id dos livros avaliados pelo usuario
+         */
+        const livrosAvaliados = _livros.map(x => { return x.livro });
+
+        /**
+         * Este find() busca os livros que ainda nao foram avaliados
+         */
+        const livros = await Livros.find(
+            {
+                "_id": {
+                    "$not": {
+                        "$in": livrosAvaliados
+                    }
+                }
+            }
+        );
+
+        return res.send({ livros });
+    } catch (err) {
+        return res.status(400).send({ Error: 'Erro listando livros' })
+    }
+
+
+})
+
+
 
 /**
  * Lista apenas 1 livro
  */
-router.get('/:livrosId', async (req, res) => {
+router.get('livrosId', async (req, res) => {
     res.send({ user: req.userId });
 
 })
@@ -59,16 +96,26 @@ router.post('/livros', async (req, res) => {
         const livro = await Livros.create({ ...req.body, user: req.userId });
         return res.send({ livro });
     } catch (err) {
-        console.log(err)
         return res.status(400).send({ Error: 'Erro criando livro' })
     }
 
 })
 
 
-router.delete('/:livrosId', async (req, res) => {
-    res.send({ user: req.userId });
-
+router.delete('/livros/:livrosId', async (req, res) => {
+    try {
+        /**
+         * Verifico se o livro ja foi avaliado e nao pode excluir
+         */
+        if (await Notas.find({ livro: req.params.livrosId })) {
+            console.log('entrou');
+            return res.status(400).send({ Error: 'O livro foi avaliado e não pode ser apagado' })
+        }
+        await Livros.findByIdAndRemove(req.params.livrosId);
+        return res.send();
+    } catch (err) {
+        return res.status(400).send({ Error: 'Erro ao deletar' });
+    }
 })
 
 /**
@@ -76,7 +123,9 @@ router.delete('/:livrosId', async (req, res) => {
  */
 router.get('/notas', async (req, res) => {
     try {
-        const notas = await Notas.find().populate('User');
+        const notas = await Notas.find({ user: req.userId })
+            .populate('livro');
+
         return res.send({ notas });
     } catch (err) {
         return res.status(400).send({ Error: 'Erro listando notas' })
@@ -84,6 +133,44 @@ router.get('/notas', async (req, res) => {
 
 
 })
+
+
+/**
+ * Lista de livros e media de avaliações
+ */
+router.get('/notasmedia', async (req, res) => {
+    try {
+        // const notas = await Notas.find();
+        // const livros = await Livros.find();
+
+        // for (let i = 0; i < livros.length; i++) {
+        //     const teste = livros[i]._id;
+        //     console.log(teste.titulo);
+        //     for (let x = 0; x < notas.length; x++) {
+        //         if (livros[i]._id === notas[x].livro) {
+        //             console.log(teste);
+        //         }
+
+        //     }
+
+        // }
+
+
+
+
+
+
+
+
+        return res.send({ notas });
+    } catch (err) {
+        return res.status(400).send({ Error: 'Erro listando notas' })
+    }
+
+
+})
+
+
 
 
 /**
@@ -99,7 +186,7 @@ router.get('/:notasId', async (req, res) => {
  */
 router.post('/notas', async (req, res) => {
     try {
-        const notas = await Notas.create({ ...req.body, user: req.userId });
+        const notas = await Notas.create({ nota: req.body.nota, user: req.userId, livro: req.body.livroId });
         return res.send({ notas });
     } catch (err) {
         return res.status(400).send({ Error: 'Erro atribuindo uma nota ao livro' })
@@ -108,9 +195,13 @@ router.post('/notas', async (req, res) => {
 })
 
 
-router.delete('/:notasId', async (req, res) => {
-    res.send({ user: req.userId });
-
+router.delete('/notas/:notasId', async (req, res) => {
+    try {
+        await Notas.findByIdAndRemove(req.params.notasId);
+        return res.send();
+    } catch (err) {
+        return res.status(400).send({ Error: 'Erro ao deletar' });
+    }
 })
 
 
