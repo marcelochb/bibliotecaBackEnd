@@ -28,4 +28,4 @@ app.use(bodyParser.urlencoded({ extended: false }));
 require('./app/controller/authController')(app);
 require('./app/controller/projectController')(app);
 
-app.listen(4000); 
+app.listen(process.env.PORT || 4000); 
