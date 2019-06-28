@@ -5,7 +5,7 @@ const app = express();
 
 
 
-app.use(cors());
+
 app.use(function (req, res, next) {
 
 
@@ -24,7 +24,7 @@ app.use(function (req, res, next) {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(cors());
 require('./app/controller/authController')(app);
 require('./app/controller/projectController')(app);
 
