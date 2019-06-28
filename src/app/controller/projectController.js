@@ -141,7 +141,7 @@ router.get('/notas', async (req, res) => {
 router.get('/notasmedia', async (req, res) => {
     try {
         // const notas = await Notas.find();
-        // const livros = await Livros.find();
+        const livros = await Livros.find();
 
         // for (let i = 0; i < livros.length; i++) {
         //     const teste = livros[i]._id;
@@ -155,14 +155,7 @@ router.get('/notasmedia', async (req, res) => {
 
         // }
 
-
-
-
-
-
-
-
-        return res.send({ notas });
+        return res.send({ livros });
     } catch (err) {
         return res.status(400).send({ Error: 'Erro listando notas' })
     }
