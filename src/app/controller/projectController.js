@@ -29,7 +29,6 @@ router.get('/user', async (req, res) => {
  */
 router.get('/livros', async (req, res) => {
     try {
-        console.log('entrou')
         const livro = await Livros.find();
         return res.send({ livro });
     } catch (err) {
@@ -111,7 +110,7 @@ router.delete('/livros/:livrosId', async (req, res) => {
         /**
          * Verifico se o livro ja foi avaliado e nao pode excluir
          */
-        if (await Notas.find({ livro: req.params.livrosId })) {
+        if (!(await Notas.find({ livro: req.params.livrosId }))) {
             return res.status(200).send({ Error: 'O livro foi avaliado e não pode ser apagado' })
         }
         await Livros.findByIdAndRemove(req.params.livrosId);
