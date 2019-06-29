@@ -103,15 +103,16 @@ router.post('/livros', async (req, res) => {
 
 })
 
-
+/**
+ * Apaga o livro
+ */
 router.delete('/livros/:livrosId', async (req, res) => {
     try {
         /**
          * Verifico se o livro ja foi avaliado e nao pode excluir
          */
         if (await Notas.find({ livro: req.params.livrosId })) {
-            console.log('entrou');
-            return res.status(400).send({ Error: 'O livro foi avaliado e não pode ser apagado' })
+            return res.status(200).send({ Error: 'O livro foi avaliado e não pode ser apagado' })
         }
         await Livros.findByIdAndRemove(req.params.livrosId);
         return res.send();
@@ -176,6 +177,28 @@ router.get('/notasmedia', async (req, res) => {
 
 })
 
+// router.get('/notamedia/:livroId', async (req, res) => {
+//     try {
+//         const total = await Notas.find({ livro: req.params.livroId }).count();
+//         console.log('total' + total)
+//         const soma = await Notas.find({ livro: req.params.livroId });
+
+//         const teste = soma.distinct('nota')
+
+
+//         //soma = soma.sum(x => x.nota);
+//         console.log(soma)
+//         //const media = (soma / total);
+//         console.log(media)
+//         return res.send({ media })
+
+
+//     } catch (error) {
+//         return res.status(400).send({ Error: 'Erro listando notas' })
+
+//     }
+
+// })
 
 
 
