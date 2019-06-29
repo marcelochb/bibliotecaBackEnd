@@ -29,6 +29,7 @@ router.get('/user', async (req, res) => {
  */
 router.get('/livros', async (req, res) => {
     try {
+        console.log('entrou')
         const livro = await Livros.find();
         return res.send({ livro });
     } catch (err) {
@@ -47,12 +48,13 @@ router.get('/livrosnotas', async (req, res) => {
          *  Este find() tras os livros avaliados pelo usuarios
          */
         const _livros = await Notas.find({ user: req.userId }).select('livro');
+        console.log(_livros)
 
         /**
          *  aqui eu separa apenas o _id dos livros avaliados pelo usuario
          */
         const livrosAvaliados = _livros.map(x => { return x.livro });
-
+        console.log(livrosAvaliados)
         /**
          * Este find() busca os livros que ainda nao foram avaliados
          */
@@ -65,7 +67,7 @@ router.get('/livrosnotas', async (req, res) => {
                 }
             }
         );
-
+        console.log(livros)
         return res.send({ livros });
     } catch (err) {
         return res.status(400).send({ Error: 'Erro listando livros' })
@@ -140,8 +142,19 @@ router.get('/notas', async (req, res) => {
  */
 router.get('/notasmedia', async (req, res) => {
     try {
-        // const notas = await Notas.find();
-        const livros = await Livros.find();
+        const livrosAvaliados = await Notas.distinct('livro');
+        const livros = await Livros.find(
+            {
+                "_id": {
+                    "$in": livrosAvaliados
+                }
+            }
+        );
+        const notas = await Notas.find();
+        const result = {
+            livros: livros,
+            notas: notas
+        };
 
         // for (let i = 0; i < livros.length; i++) {
         //     const teste = livros[i]._id;
@@ -155,7 +168,7 @@ router.get('/notasmedia', async (req, res) => {
 
         // }
 
-        return res.send({ livros });
+        return res.send({ result });
     } catch (err) {
         return res.status(400).send({ Error: 'Erro listando notas' })
     }
