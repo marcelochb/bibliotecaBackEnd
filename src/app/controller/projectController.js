@@ -120,6 +120,24 @@ router.delete('/livros/:livrosId', async (req, res) => {
     }
 })
 
+
+/**
+ * Atualiza um livro
+ */
+router.put('/livros/:livrosId', async (req, res) => {
+    try {
+        const { titulo, autor, editora } = req.body;
+
+        await Livros.findByIdAndUpdate(req.params.livrosId, { titulo, autor, editora }, { new: true });
+        return res.send();
+    } catch (err) {
+        return res.status(400).send({ Error: 'Erro ao deletar' });
+    }
+})
+
+
+
+
 /**
  * Lista todos as notas
  */
@@ -156,17 +174,6 @@ router.get('/notasmedia', async (req, res) => {
             notas: notas
         };
 
-        // for (let i = 0; i < livros.length; i++) {
-        //     const teste = livros[i]._id;
-        //     console.log(teste.titulo);
-        //     for (let x = 0; x < notas.length; x++) {
-        //         if (livros[i]._id === notas[x].livro) {
-        //             console.log(teste);
-        //         }
-
-        //     }
-
-        // }
 
         return res.send({ result });
     } catch (err) {
