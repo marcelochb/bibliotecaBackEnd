@@ -1,4 +1,7 @@
 # Aktie Now
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/marcelochb/bibliotecaBackEnd.svg)](https://greenkeeper.io/)
+
 ## Teste de Desenvolvedor Web (BackEnd)
 
 
